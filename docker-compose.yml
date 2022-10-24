@@ -1,0 +1,32 @@
+version: "3.9"
+services:
+  mongodb:
+    image: 'mongo'
+    volumes:
+      - data:/data/db
+    env_file:
+      - ./env/mongodb.env
+  backend:
+    # Dockerfile 位址
+    build: ./backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    env_file:
+      - ./env/backend.env
+    # 建立依賴關係，讓 depends_on 的 image 先於自己啟動
+    depends_on:
+      - mongodb
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+volumes:
+  data:
